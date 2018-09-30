@@ -43,8 +43,6 @@ flutter:
     - assets/unicode/Unihan_Readings.txt
     - assets/unicode/Unihan_Variants.txt
 
-    - assets/coe21-zinbun/getpicture2.data.tsv
-
     - assets/fonts/HanaMinA.yaml
     - assets/fonts/HanaMinB.yaml
     - assets/fonts/NotoSerifCJKjp-Regular.yaml
