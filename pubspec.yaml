@@ -43,14 +43,14 @@ flutter:
     - assets/unicode/Unihan_Readings.txt
     - assets/unicode/Unihan_Variants.txt
 
-    - assets/fonts/HanaMinA.yaml
-    - assets/fonts/HanaMinB.yaml
-    - assets/fonts/NotoSerifCJKjp-Regular.yaml
-    - assets/fonts/NotoSerifCJKkr-Regular.yaml
-    - assets/fonts/NotoSerifCJKsc-Regular.yaml
-    - assets/fonts/NotoSerifCJKtc-Regular.yaml
-    #- assets/fonts/TH-Sung-PP0.yaml
-    #- assets/fonts/TH-Sung-PP2.yaml
+    - fonts/HanaMinA.yaml
+    - fonts/HanaMinB.yaml
+    - fonts/NotoSerifCJKjp-Regular.yaml
+    - fonts/NotoSerifCJKkr-Regular.yaml
+    - fonts/NotoSerifCJKsc-Regular.yaml
+    - fonts/NotoSerifCJKtc-Regular.yaml
+    #- fonts/TH-Sung-PP0.yaml
+    #- fonts/TH-Sung-PP2.yaml
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.io/assets-and-images/#resolution-aware.

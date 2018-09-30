@@ -92,7 +92,7 @@ class FontData {
         BlockInfo blockInfo = await unicodeData.getBlockInfo(codePoint);
         String blockName = blockInfo.name;
         int blockFirst = max((codePoint & ~0xff), blockInfo.first);
-        String line = await DefaultAssetBundle.of(context).loadString('assets/fonts/' + _FONT_FILE_NAME_MAP[_currentCJKType].replaceFirst('otf', 'yaml')).asStream()
+        String line = await DefaultAssetBundle.of(context).loadString('fonts/' + _FONT_FILE_NAME_MAP[_currentCJKType].replaceFirst('otf', 'yaml')).asStream()
                 .transform(LineSplitter())
                 //.map((String line) => line.trimRight())
                 .skipWhile((String line) => !line.startsWith("    name: $blockName"))
@@ -110,7 +110,7 @@ class FontData {
             // next family
         }
 
-        line = await DefaultAssetBundle.of(context).loadString('assets/fonts/HanaMinA.yaml').asStream()
+        line = await DefaultAssetBundle.of(context).loadString('fonts/HanaMinA.yaml').asStream()
                 .transform(LineSplitter())
                 //.map((String line) => line.trimRight())
                 .skipWhile((String line) => !line.startsWith("    name: $blockName"))
@@ -128,7 +128,7 @@ class FontData {
             // next family
         }
 
-        line = await DefaultAssetBundle.of(context).loadString('assets/fonts/HanaMinB.yaml', cache: true).asStream()
+        line = await DefaultAssetBundle.of(context).loadString('fonts/HanaMinB.yaml', cache: true).asStream()
                 .transform(LineSplitter())
                 //.map((String line) => line.trimRight())
                 .skipWhile((String line) => !line.startsWith("    name: $blockName"))
