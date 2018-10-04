@@ -49,8 +49,6 @@ flutter:
     - fonts/NotoSerifCJKkr-Regular.yaml
     - fonts/NotoSerifCJKsc-Regular.yaml
     - fonts/NotoSerifCJKtc-Regular.yaml
-    #- fonts/TH-Sung-PP0.yaml
-    #- fonts/TH-Sung-PP2.yaml
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.io/assets-and-images/#resolution-aware.
@@ -87,19 +85,6 @@ flutter:
     - family: Noto Serif CJK KR
       fonts:
         - asset: fonts/NotoSerifCJKkr-Regular.otf
-
-  #  - family: Source Han Serif
-  #    fonts:
-  #      - asset: fonts/SourceHanSerif-Regular.otf
-  #  - family: Source Han Serif TC
-  #    fonts:
-  #      - asset: fonts/SourceHanSerifTC-Regular.otf
-  #  - family: Source Han Serif SC
-  #    fonts:
-  #      - asset: fonts/SourceHanSerifSC-Regular.otf
-  #  - family: Source Han Serif K
-  #    fonts:
-  #      - asset: fonts/SourceHanSerifK-Regular.otf
 
   #  # basic, Extension-A
   #  - family: TH-Sung-PP0
