@@ -18,24 +18,29 @@ class _MyCanvasPageState extends State<MyCanvasPage> {
     @override
     Widget build(BuildContext context) {
 
-        return Scaffold(
-
-            appBar: AppBar(
-                leading: IconButton(
-                    icon: Icon(Icons.arrow_back, size: 32.0),
-                    onPressed: _gotoPreviousPage,
-                ),
-                title: Text('hand-writing'),
-                centerTitle: true,
+        AppBar appBar = AppBar(
+            leading: IconButton(
+                icon: Icon(Icons.arrow_back, size: 32.0),
+                onPressed: _gotoPreviousPage,
             ),
+            title: Text('hand-writing'),
+            centerTitle: true,
+        );
+
+        Widget scaffold = Scaffold(
+
+            appBar: appBar,
 
             body: Column(
                 children: <Widget>[
-                    new MyCanvas(),
+                    // appBar の 高さのみ にては 溢る
+                    new MyCanvas(appBar.preferredSize.height + 20),
                 ],
             ),
 
         );
+
+        return scaffold;
     }
 
     void _gotoPreviousPage() {
@@ -45,13 +50,15 @@ class _MyCanvasPageState extends State<MyCanvasPage> {
 
 class MyCanvas extends StatefulWidget {
 
-    MyCanvas() {
-        // TODO
+    final double appBarHeight;
+
+    MyCanvas(this.appBarHeight) {
+        // TODO?
     }
 
     @override
     State createState() {
-        return new _MyCanvasState();
+        return new _MyCanvasState(appBarHeight);
     }
 }
 
@@ -73,6 +80,12 @@ Offset _logicalToPhysical(Offset point, double renderBoxSize) {
 class _MyCanvasState extends State<MyCanvas> {
 
     List<List<Offset>> _polylineList;
+
+    final double appBarHeight;
+
+    _MyCanvasState(this.appBarHeight) {
+        // TODO?
+    }
 
     @override
     void initState() {
@@ -97,13 +110,17 @@ class _MyCanvasState extends State<MyCanvas> {
         if (screenWidth < screenHeight) {
             _renderBoxSize = screenWidth;
         } else {
-            _renderBoxSize = screenHeight - 80.0;
+            //_renderBoxSize = screenHeight - 80.0;
             // TODO: this value 80 is about the height of AppBar
             // 恐らくは 機種により 左右せむ
             // 例外が 捕へられず
+            _renderBoxSize = screenHeight - appBarHeight;
+            print("appBarHeight: " + appBarHeight.toString());
         }
 
         return Flex(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
             direction: (screenWidth < screenHeight) ? Axis.vertical : Axis.horizontal,
             children: <Widget>[
                 GestureDetector(
