@@ -1,22 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter/painting.dart';
 
 import 'dart:async';
-import 'dart:convert';
 import 'dart:core';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
+import 'util.dart';
+
 // TemplateManager は一旦 挫折せむ。
 
 const String GETPIC_URL = 'https://www.beu.jp/getpic.php';
+const String GETPICINFO_URL = 'https://www.beu.jp/getpicinfo.php';
 
 class ClippingInfo {
     int codePoint;
     String fileName;
     int x0, y0;
     int x1, y1;
-    String description;
+    String note;
 }
 
 
@@ -28,66 +31,67 @@ class TemplateManager {
         _context = context;
     }
 
-    String _getUrl(ClippingInfo clippingInfo) {
+    String _getPictureUrl(ClippingInfo clippingInfo) {
         return GETPIC_URL + "?name=${clippingInfo.fileName}"
                 + "&trim=${clippingInfo.x0},${clippingInfo.y0},${clippingInfo.x1},${clippingInfo.y1}";
     }
 
+    List<String> _getPictureInfoUrls(int codePoint) {
+        return <String>[
+            GETPICINFO_URL + "?name=coe21-zinbun&code=${codePoint.toRadixString(16).toUpperCase()}",
+            GETPICINFO_URL + "?name=daishogwen&code=${codePoint.toRadixString(16).toUpperCase()}"
+        ];
+    }
+
     Future<List<ClippingInfo>> getClipInfoListFuture(int codePoint) async {
         List<ClippingInfo> clipInfoList = <ClippingInfo>[];
-        await DefaultAssetBundle.of(_context).loadString('assets/coe21-zinbun/getpicture2.data.tsv').asStream()
-                .transform(LineSplitter())
-                .map((String line) => line.trim())
-                .forEach((String line) {
-                    List<String> itemList = line.split("\t");
-                    int _codePoint = int.parse(itemList[0], radix: 16);
-                    if (_codePoint == codePoint) {
-                        ClippingInfo clippingInfo = new ClippingInfo()
-                            ..codePoint = int.parse(itemList[0], radix: 16)
-                            ..fileName = itemList[1]
-                            ..x0 = int.parse(itemList[2])
-                            ..y0 = int.parse(itemList[3])
-                            ..x1 = int.parse(itemList[4])
-                            ..y1 = int.parse(itemList[5])
-                            ..description = itemList[6];
-                        clipInfoList.add(clippingInfo);
-
-                        () async {
-                            await http.get(_getUrl(clippingInfo))
-                                .then((http.Response response) {
-                                    if (response.statusCode / 100 == 2) {
-                                        Uint8List byteList = response.bodyBytes;
-                                        print("bodyBytes: ${byteList.lengthInBytes.toString()}");
-                                        Future<ui.Codec> codecFuture = ui.instantiateImageCodec(byteList);
-                                        codecFuture.then((ui.Codec codec) {
-                                            Future<ui.FrameInfo> frameInfoFuture = codec.getNextFrame();
-                                            frameInfoFuture.then((ui.FrameInfo frameInfo) {
-                                                ui.Image image = frameInfo.image;
-                                                print("${image.width.toString()}, ${image.height.toString()}");
+        _getPictureInfoUrls(codePoint)
+                .forEach((String url) async {
+                    await http.get(url)
+                            .then((http.Response response) {
+                                if (response.statusCode / 100 == 2) {
+                                    response.body.split("\n")
+                                            .map((String line) => line.trim())
+                                            .forEach((String line) {
+                                                List<String> itemList = line.split("\t");
+                                                ClippingInfo clippingInfo = new ClippingInfo()
+                                                    ..codePoint = int.parse(itemList[0].substring(2), radix: 16)
+                                                    ..fileName = itemList[1]
+                                                    ..x0 = int.parse(itemList[2])
+                                                    ..y0 = int.parse(itemList[3])
+                                                    ..x1 = int.parse(itemList[4])
+                                                    ..y1 = int.parse(itemList[5])
+                                                    ..note = itemList[6];
+                                                clipInfoList.add(clippingInfo);
                                             });
-                                        });
-                                    }
+                                } else {
+                                    Util.showErrorDialog(_context, response.reasonPhrase);
+                                }
                             });
-                        }();
-                    }
                 });
         return clipInfoList;
     }
 
-    void drawClippingImage(ClippingInfo clippingInfo, ui.Canvas canvas, ui.Size size) async {
-        http.Response response = await http.get(_getUrl(clippingInfo));
-        if (response.statusCode == 200) {
+    void drawClippingImage(ClippingInfo clippingInfo, ui.Canvas canvas, ui.Size canvasSize) async {
+        assert(canvasSize.width == canvasSize.height);
+        http.Response response = await http.get(_getPictureUrl(clippingInfo));
+        if (response.statusCode / 100 == 2) {
             Uint8List byteList = response.bodyBytes;
-            Image image = Image.memory(byteList);
+
+            ui.Image image = await decodeImageFromList(byteList);
             print("image.width: " + image.width.toString());
             print("image.height: " + image.height.toString());
+            assert(image.width == clippingInfo.x1 - clippingInfo.x0 && image.height == clippingInfo.y1 - clippingInfo.y0);
 
-            Rect sourceRect = Rect.fromLTRB(clippingInfo.x0.toDouble(), clippingInfo.y0.toDouble(), clippingInfo.x1.toDouble(), clippingInfo.y1.toDouble());
-            //Rect targetRect = sourceRect.width < sourceRect.height ?
-            // size.width : sourceRect.width = ? : sourceRect.height?
-            double scaleFactor = (sourceRect.height * size.width < sourceRect.width * size.height)
-                    ? size.width / sourceRect.width
-                    : size.height / sourceRect.height;
+            Rect sourceRect = Rect.fromLTRB(0, 0, image.width.toDouble(), image.height.toDouble());
+            double scaleFactor = (sourceRect.height * canvasSize.width < sourceRect.width * canvasSize.height)
+                    ? canvasSize.width / sourceRect.width
+                    : canvasSize.height / sourceRect.height;
+            Paint paint = Paint()
+                ..blendMode = BlendMode.src;
+            canvas.drawImageRect(image, sourceRect, Rect.fromLTWH((canvasSize.width - scaleFactor * sourceRect.width) / 2.0, (canvasSize.height - scaleFactor * sourceRect.height) / 2.0, scaleFactor * sourceRect.width, scaleFactor * sourceRect.height), paint);
+        } else {
+            Util.showErrorDialog(_context, response.reasonPhrase);
         }
     }
 }

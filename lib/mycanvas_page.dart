@@ -115,8 +115,8 @@ class _MyCanvasState extends State<MyCanvas> {
             // 恐らくは 機種により 左右せむ
             // 例外が 捕へられず
             _renderBoxSize = screenHeight - appBarHeight;
-            print("appBarHeight: " + appBarHeight.toString());
         }
+        print("renderBoxSize: " + _renderBoxSize.toString());
 
         return Flex(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -169,6 +169,10 @@ class _MyCanvasState extends State<MyCanvas> {
                             ),
                         ],
                     ),
+                ),
+                Padding(
+                    padding: EdgeInsets.all(4.0),
+                    child: Text("U+4E00"),
                 ),
             ],
         );
@@ -230,6 +234,10 @@ class MyPainter extends CustomPainter {
             ..color = Color.fromARGB(255, 0, 64, 0)
             ..style = PaintingStyle.fill;
         canvas.drawRect(Rect.fromLTWH(0.0, 0.0, size.width, size.height), paint);
+
+        //
+        // draw template
+        //
 
         // draw axises
 
